@@ -3,5 +3,8 @@
 {% block title %} post page {% end %}
 
 {% block content %}
-I am post {{ post_id }} page <br>
+    I am post {{ post_id }} page <br>
+    {% for num in range(1, 6) %}
+        <img src="/static/images/0{{ num }}.jpg" width="500px" height="500px"><br>
+    {% end %}
 {% end %}
