@@ -4,32 +4,11 @@ import tornado.options
 
 
 from tornado.options import define, options
-from tornado.web import RequestHandler
 
+
+from handler.main import IndexHandler, ExploreHandler, PostHandler
 
 define('port', default=8080, help='listening port', type=int)
-
-
-# 主页面
-class IndexHandler(RequestHandler):
-    def get(self):
-        self.render('index.html')
-
-
-
-# 发现最新上传图片的页面
-class ExploreHandler(RequestHandler):
-    def get(self):
-        self.render('explore.html')
-
-
-# 用户详情页面
-class PostHandler(RequestHandler):
-    def get(self, *args, **kwargs):
-        self.render(
-            template_name='post.html',
-            post_id=kwargs['post_id'],
-        )
 
 
 class Application(tornado.web.Application):
@@ -43,6 +22,7 @@ class Application(tornado.web.Application):
             debug=True,
             template_path='./templates',
             static_path='./static',
+            static_url_prefix='/pic/',
         )
         super().__init__(handlers, **settings)
 
