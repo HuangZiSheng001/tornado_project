@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title1 %} login {% end %}</title>
+    <link rel="shortcut icon" href="{{ static_url('images/ico_01.ico') }}">
+</head>
+<body>
+    {% block body1 %}
+        <form method="post" action="/login_ok_03">
+            <p>用户名<br /><input type="text" name="name"></p>
+            <p>密  码<br /><input type="password" name="password"></p>
+            <input type="submit">
+        </form>
+    {% end %}
+</body>
+</html>

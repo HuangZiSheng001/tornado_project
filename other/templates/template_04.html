@@ -1,0 +1,26 @@
+{% extends ./login_02.html %}
+
+{% block title1 %} Extends_01 {% end %}
+
+
+{% block body1 %}
+    <h1>HZS</h1>
+    <img src="{{ static_url('images/03.jpg') }}" width="200">
+    {% include ./include_01.html %}
+{% end %}
+
+
+{% module MyClass_01() %}
+<br />
+
+{% module Advertisement() %}
+
+
+
+{% apply upper %}
+    asdfasfasfsadassd
+{% end %}
+
+{{ linkfy('百度: https://www.baidu.com') }}
+
+<br />

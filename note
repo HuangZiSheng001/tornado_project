@@ -1,0 +1,4 @@
+虚拟环境
+    which python3   显示路径名
+    mkvirtualenv -p python解释器路径  虚拟环境名
+

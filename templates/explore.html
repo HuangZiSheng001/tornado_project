@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %} explore {% end %}
+
+{% block content %}
+    explore
+    {% for num in range(1, 6) %}
+        <img src="/static/images/0{{ num }}.jpg" width="500px" height="500px"><br>
+    {% end %}
+{% end %}

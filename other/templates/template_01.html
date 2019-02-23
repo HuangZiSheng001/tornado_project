@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>template</title>
+</head>
+
+<body>
+    <h1>欢迎 {{ username }} 登录 </h1>
+    <br />
+    <h2>现在时间： {{ time }} </h2>
+    <br />
+    <br />
+    {% if username != '' %}
+        <p>欢迎 {{ username }} 登录</p>
+    {% else %}
+        <p>请登录</p>
+    {% end %}
+
+    <br />
+    <br />
+    {# time.ctime() #}
+    {{! 1+1 }}
+
+    <br />
+    <br />
+    {% for i in url_list %}
+        <a href="{{ i[0] }}" target="_blank">{{ i[1] }}</a>
+    {% end %}
+
+    <br />
+    <br />
+    {% set a=0 %}
+    {% while a < 8 %}
+        {{ a }} <br />
+        {% set a += 1 %}
+    {% end %}
+
+
+</body>
+</html>
