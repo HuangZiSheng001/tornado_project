@@ -6,7 +6,8 @@ import tornado.options
 from tornado.options import define, options
 
 
-from handler.main import IndexHandler, ExploreHandler, PostHandler
+from handler.main import IndexHandler, ExploreHandler, PostHandler, UploadHandler
+
 
 define('port', default=8080, help='listening port', type=int)
 
@@ -17,12 +18,13 @@ class Application(tornado.web.Application):
             (r'/', IndexHandler),
             (r'/explore', ExploreHandler),
             (r'/post/(?P<post_id>[0-9]+)', PostHandler),
+            (r'/upload', UploadHandler),
         ]
         settings = dict(
             debug=True,
             template_path='./templates',
             static_path='./static',
-            static_url_prefix='/pic/',
+            # static_url_prefix='/pic/',
         )
         super().__init__(handlers, **settings)
 

@@ -4,7 +4,7 @@
 
 {% block content %}
     explore<hr>
-    {% for num in range(1, 6) %}
-        <img src="/static/images/0{{ num }}.jpg" width="500px" height="500px"><br>
+    {% for image in images %}
+        <img src={{ image }}><br>
     {% end %}
 {% end %}
