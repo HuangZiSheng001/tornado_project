@@ -20,3 +20,21 @@ class PostHandler(RequestHandler):
             template_name='post.html',
             post_id=kwargs['post_id'],
         )
+
+
+# 用户提交
+class UploadHandler(RequestHandler):
+    def get(self):
+        self.render('upload.html')
+
+    def post(self):
+        img_list = self.request.file.get('picture', [])
+        upload_img = img_list[0]
+
+        # {"filename":..., "content_type":..., "body":...}
+        # html content type对照表
+        with open(upload_img['filename'], 'wb') as fp:
+            fp.write(upload_img['body'])
+            pass
+
+        self.write(upload_img['filename'] + ' ' + upload_img['content_type'])
