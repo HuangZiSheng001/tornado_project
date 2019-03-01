@@ -18,7 +18,7 @@ def get_thumbnail():
     return glob.glob(thumbnail_path)
 
 
-# 生成略缩图并转换
+# 生成略缩图并保存
 def save_thumbnail(image_path):
     im = Image.open(image_path)
     size = (200, 200)

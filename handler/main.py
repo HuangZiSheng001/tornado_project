@@ -1,12 +1,12 @@
 import os
 
-from tornado.web import RequestHandler
+from tornado.web import RequestHandler, authenticated
 
 from util.photo import get_imgs, save_thumbnail, get_thumbnail
-
+from .auth import AuthBaseHandler
 
 # 主页面
-class IndexHandler(RequestHandler):
+class IndexHandler(AuthBaseHandler):
     def get(self):
         images = get_imgs()
 
@@ -16,8 +16,10 @@ class IndexHandler(RequestHandler):
         )
 
 
-# 发现最新上传图片的页面， 展示略缩图
-class ExploreHandler(RequestHandler):
+# 发现最新上传图片的页面， 展示略缩图, 需要登陆后才能访问
+class ExploreHandler(AuthBaseHandler):
+
+    @authenticated
     def get(self):
         images = get_thumbnail()
 
@@ -27,8 +29,10 @@ class ExploreHandler(RequestHandler):
         )
 
 
-# 用户详情页面， 展示完全图
+# 用户详情页面， 展示完全图, 需要登陆后才能访问
 class PostHandler(RequestHandler):
+
+    @authenticated
     def get(self, *args, **kwargs):
         self.render(
             template_name='post.html',
@@ -36,8 +40,10 @@ class PostHandler(RequestHandler):
         )
 
 
-# 用户上传文件页面
+# 用户上传文件页面, 需要登陆后才能访问
 class UploadHandler(RequestHandler):
+
+    @authenticated
     def get(self):
         self.render('upload.html')
 
@@ -65,3 +71,6 @@ class UploadHandler(RequestHandler):
 
         # self.write(upload_img['filename'] + ' ' + upload_img['content_type'])
         # self.write(save_pic_path)
+
+
+

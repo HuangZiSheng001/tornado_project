@@ -1,15 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}登录{% endblock %}
+{% block title %}登录{% end %}
 
 
-{% block head %}
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/login_regist.css') }}">
-{% endblock %}
-
-{% block main %}
+{% block content %}
     <h3 class="page-title">登录</h3>
-    <form action="" method="POST">
+    <form action="/login?next={{ nextname }}" method="POST">
         <div class="form-container">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="手机号码" name="telephone">
@@ -22,4 +18,4 @@
             </div>
         </div>
     </form>
-{% endblock %}
+{% end %}

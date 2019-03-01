@@ -2,3 +2,15 @@
     which python3   显示路径名
     mkvirtualenv -p python解释器路径  虚拟环境名
 
+
+查看手册
+man ps
+
+查看进程 端口
+ps -ef|grep python
+
+cpu使用情况
+ps -aux|more
+
+杀死id为8888的进程
+kill 8888
