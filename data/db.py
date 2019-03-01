@@ -34,6 +34,7 @@ session = Session()
 
 
 if __name__ == '__main__':
+    print(Db_url)
     try:
         # 连接数据库
         connection = engine.connect()
