@@ -9,7 +9,7 @@ from tornado.options import define, options
 # tornado没有内置session
 from pycket.session import SessionMixin
 
-from handler.auth import LoginHandler, LoginOutHandler
+from handler.auth import LoginHandler, LoginOutHandler, RegistHandler
 from handler.main import IndexHandler, ExploreHandler, PostHandler, UploadHandler
 
 
@@ -28,7 +28,7 @@ class Application(tornado.web.Application):
             (r'/post/(?P<post_id>[0-9]+)', PostHandler),
             (r'/upload', UploadHandler),
             (r'/login', LoginHandler),
-            (r'/regist', LoginHandler),
+            (r'/regist', RegistHandler),
             (r'/logout', LoginOutHandler),
         ]
         settings = dict(

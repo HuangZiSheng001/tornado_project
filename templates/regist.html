@@ -1,11 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}注册{% end %}
+{% block title %}regist{% end %}
 
 
 {% block content %}
     <h3 class="page-title">注册</h3>
-    <form action="/regist" method="POST">
+
+    {% if msg %}
+        <div class="tip_message" >
+            <h4>
+                {{ msg }}
+            </h4>
+
+        </div>
+    {% end %}
+
+    <form action="/regist" method="POST" enctype="multipart/form-data">
         <div class="form-container">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="手机号码" name="telephone" required="">

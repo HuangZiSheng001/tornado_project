@@ -1,27 +1,24 @@
-
-
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Table
-from .connect import Base, session
-from datetime import datetime
+from sqlalchemy.sql import exists
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import relationship
 
 
+from datetime import datetime
+
+from .db import Base, DBSession
+
+
+session = DBSession()
 
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    telephone = Column(String(15), nullable=False)
+    telephone = Column(String(15), nullable=False, unique=True)
     username = Column(String(50), nullable=False)
     password = Column(String(100), nullable=False)
+    create_time = Column(DateTime, default=datetime.now)
 
-    def __init__(self, *args, **kwargs):
-        telephone = kwargs.get('telephone')
-        username = kwargs.get('username')
-        password = kwargs.get('password')
-
-        self.telephone = telephone
-        self.username = username
-        self.password = password
 
 
     def __repr__(self):
@@ -33,10 +30,44 @@ class User(Base):
         )
 
 
-    def check_password(self, raw_password):
-        # result = check_password_hash(self.password, raw_password)
-        result = True
-        return result
+    @classmethod
+    def add_user(cls, telephone, username, hashed_password):
+        '''
+        添加用户的函数
+        :param username: 用户名
+        :param telephone: 手机号码
+        :param hashed_password: 已经加密过的密码
+        :return: None
+        '''
+        user = User(telephone=telephone, username=username, password=hashed_password)
+
+        session.add(user)
+
+        session.commit()
+
+
+    # 通过telephone获取username
+    @classmethod
+    def get_username_by_telephone(cls, telephone):
+        user = session.query(cls).filter(cls.telephone == telephone).first()
+        return user.username
+
+
+    # 核对telephone和password
+    @classmethod
+    def check_password(cls, telephone, hashed_password):
+        user = session.query(cls).filter(cls.telephone == telephone).filter(cls.password == hashed_password).first()
+
+        if user:
+            return True
+
+        return False
+
+
+    # 检查该号码是否已经注册过
+    @classmethod
+    def is_exists(cls, telephone):
+        return session.query(exists().where(User.telephone == telephone)).scalar()
 
 
 
@@ -70,3 +101,15 @@ class User(Base):
         return session.query(cls).filter(cls.username == user).first()
 
 '''
+
+
+if __name__ == '__main__':
+
+    # 测试用例
+    telephone = '12345678910'
+    username = 'root'
+    password = 'root'
+
+    my_user = User()
+    print(User.is_exists(telephone=telephone))
+    print(User.get_username_by_telephone(telephone=telephone))
