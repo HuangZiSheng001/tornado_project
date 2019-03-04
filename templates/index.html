@@ -3,9 +3,10 @@
 {% block title %} index {% end %}
 
 {% block content %}
-    index <hr>
-    {% for image in images %}
-        <img src="{{ image }}" width="500px" height="500px"><br>
+    <h1>index</h1><br>
+    <hr>
+    {% for post in posts %}
+        <img src="{{ post.image_url }}" width="500px" height="500px"><br>
     {% end %}
 
 {% end %}

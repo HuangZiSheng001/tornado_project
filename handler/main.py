@@ -1,18 +1,21 @@
-import os
+import time
 
 from tornado.web import RequestHandler, authenticated
-
-from util.photo import get_imgs, save_thumbnail, get_thumbnail
+from util.photo import get_all_post, get_imgs, save_thumbnail, get_thumbnail, save_upload_pic, add_post_for, get_post_by_id
 from .auth import AuthBaseHandler
 
-# 主页面
+
+# 主页面，所关注的用户的图片展示
 class IndexHandler(AuthBaseHandler):
+
     def get(self):
-        images = get_imgs()
+
+        posts = get_all_post()
 
         self.render(
             template_name='index.html',
-            images=images,
+            posts=posts,
+            user=self.current_user
         )
 
 
@@ -21,56 +24,74 @@ class ExploreHandler(AuthBaseHandler):
 
     @authenticated
     def get(self):
-        images = get_thumbnail()
+        # images = get_thumbnail()
+
+        posts = get_all_post()
 
         self.render(
             template_name='explore.html',
-            images=images,
+            posts=posts,
+            user=self.current_user
         )
 
 
 # 用户详情页面， 展示完全图, 需要登陆后才能访问
-class PostHandler(RequestHandler):
+class PostHandler(AuthBaseHandler):
 
     @authenticated
     def get(self, *args, **kwargs):
         self.render(
             template_name='post.html',
-            post_id=kwargs['post_id'],
+            post=get_post_by_id(kwargs['post_id']),
+            user=self.current_user,
         )
 
 
 # 用户上传文件页面, 需要登陆后才能访问
-class UploadHandler(RequestHandler):
+class UploadHandler(AuthBaseHandler):
 
     @authenticated
     def get(self):
-        self.render('upload.html')
+        self.render(
+            template_name='upload.html',
+            user=self.current_user,
+        )
 
     def post(self):
         img_list = self.request.files.get('picture', [])
-        upload_img = img_list[0]
 
-        # {"filename":..., "content_type":..., "body":...}
-        # html content type对照表
+        post_id = 0
 
-        save_pic_path = os.path.join('./static/upload', upload_img['filename'])
+        for upload_img in img_list:
 
-        with open(save_pic_path, 'wb') as fp:
-            fp.write(upload_img['body'])
+            upload_img_path = save_upload_pic(upload_img)
 
-        self.write('上传图片成功<hr>')
+            thumb_path = save_thumbnail(image_path=upload_img_path)
 
-        save_thumbnail(image_path=save_pic_path)
-        self.write('略缩图保存成功')
+            post = add_post_for(self.current_user, upload_img_path, thumb_path)
+
+            post_id = post.id
+
+        self.write('略缩图保存成功, 5秒后将跳转到详情页')
+
+        time.sleep(5)
+
+        self.redirect(f'/post/{post_id}')
 
 
 
+# 接收找不到的路由
+class NoneHandle_01(RequestHandler):
+    def get(self, *args):
+        self.send_error(404)
+        # self.set_status(404, 'error!!!')
 
-        # f''   python3.6  f string方法
+    def write_error(self, status_code, **kwargs):
+        # self.write('statu code: {}'.format(status_code))
+        self.render(template_name='404.html')
 
-        # self.write(upload_img['filename'] + ' ' + upload_img['content_type'])
-        # self.write(save_pic_path)
+    def post(self):
+        pass
 
 
 

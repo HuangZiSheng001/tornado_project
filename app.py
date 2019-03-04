@@ -7,10 +7,9 @@ from tornado.options import define, options
 
 
 # tornado没有内置session
-from pycket.session import SessionMixin
 
 from handler.auth import LoginHandler, LoginOutHandler, RegistHandler
-from handler.main import IndexHandler, ExploreHandler, PostHandler, UploadHandler
+from handler.main import IndexHandler, ExploreHandler, PostHandler, UploadHandler, NoneHandle_01
 
 
 import util.ui_methods
@@ -30,6 +29,9 @@ class Application(tornado.web.Application):
             (r'/login', LoginHandler),
             (r'/regist', RegistHandler),
             (r'/logout', LoginOutHandler),
+
+            # 接受找不到的路由
+            (r'/(.*)', NoneHandle_01),
         ]
         settings = dict(
             debug=True,

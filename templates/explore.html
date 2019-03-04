@@ -3,8 +3,10 @@
 {% block title %} explore {% end %}
 
 {% block content %}
-    explore<hr>
-    {% for image in images %}
-        <img src={{ image }}><br>
+    <h1>Explore</h1>
+
+    <hr>
+    {% for post in posts %}
+        <img src={{ post.thumb_url }}><br>
     {% end %}
 {% end %}

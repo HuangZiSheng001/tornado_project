@@ -3,7 +3,7 @@
 '''
 
 import hashlib
-
+import os
 from data.account import User
 
 
@@ -32,10 +32,30 @@ def authenticate(telephone, raw_password):
     return False
 
 
-#  注册信息正确后，把新注册的账户加入到数据库中
+#  注册
 def regist(username, telephone, raw_password):
+    '''
+    注册信息正确后，把新注册的账户加入到数据库中,
+    并在upload和thumb中创建用户文件夹(用telephone来命名)
+
+    :param username:
+    :param telephone:
+    :param raw_password:
+    :return:
+    '''
+
     if not User.is_exists(telephone=telephone):
+
+        # 添加入DB中
         User.add_user(username=username, telephone=telephone, hashed_password=hashed(raw_password))
+
+        # 在相关文件夹中创建用户文件夹
+        '''
+        if not os.path.exists(''):
+            os.mkdir(telephone)
+        '''
+
+
         return {'msg': 'ok'}
     else:
         return {'msg': 'This number has been registered.'}
@@ -53,7 +73,7 @@ def is_exsist_user(telephone):
 
 if __name__ == '__main__':
 
-    regist(telephone='12345678911', username='jjj', raw_password='kkk')
+    regist(telephone='12345678912', username='hhs', raw_password='kkk')
 
     my_telephone = '12345678910'
     my_password = 'root'
