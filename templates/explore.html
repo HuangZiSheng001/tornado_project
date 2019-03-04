@@ -7,6 +7,10 @@
 
     <hr>
     {% for post in posts %}
-        <img src={{ post.thumb_url }}><br>
+        <a href="/post/{{ p.id }}">
+            <img src="{{ static_url(post.thumb_url) }}" width="500px" height="500px">
+        </a>
+
+        <br>
     {% end %}
 {% end %}

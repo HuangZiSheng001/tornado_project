@@ -3,7 +3,9 @@
 {% block title %} post page {% end %}
 
 {% block content %}
-    I am post {{ post.id }} page <br>
-    <img src="/{{ post.image_url }}"><br>
+    <h1>I am post {{ post.id }} page</h1>
+    <br>
+    <img src="{{ static_url(post.image_url) }}"><br>
 
+    <p>upload by <b>{{ post.user.username }} </b></p>
 {% end %}

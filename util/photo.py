@@ -44,25 +44,34 @@ class UploadImage(object):
         :param old_name:
         :param static_path:
         """
-        self.old_name = old_name
 
-        # 新的文件名将会是唯一的，不会重复的
-        self.name = self.gen_new_name()
+        self.uuid_name = self.gen_uuid_name()
+        self.ext = self.get_ext(old_name)
+
+        # 拼凑起来的完整文件名
+        self.name = self.uuid_name + self.ext
         self.static_path = static_path
 
-    def gen_new_name(self):
+    def get_ext(self, old_name):
+        """
+        获取后缀
+        :return: 获取后缀
+        """
+        _, ext = os.path.splitext(old_name)
+        return ext
+
+    def gen_uuid_name(self):
         """
         生成唯一的文件ID，用来作为图片的名字
-        :param old_name: 旧名字
-        :return: 新生成的名字
+        :return:
         """
-        _, ext = os.path.splitext(self.old_name)
-        return uuid.uuid4().hex + ext
+        return uuid.uuid4().hex
 
     @property
-    def upload_url(self):
+    def upload_img_url(self):
         """
         使用property是让该方法变成一个属性
+        生成保存图片的相对路径的url
         :return: 保存图片的相对路径的url
         """
         return os.path.join(self.upload_dir, self.name)
@@ -72,7 +81,7 @@ class UploadImage(object):
         """
         :return:upload_path
         """
-        return os.path.join(self.static_path, self.upload_url)
+        return os.path.join(self.static_path, self.upload_img_url)
 
     def save_upload_pic(self, content):
         """
@@ -89,9 +98,7 @@ class UploadImage(object):
         生成用来保存图片缩略图相对路径的url
         :return:thum_url
         """
-        name, ext = os.path.splitext(self.name)
-
-        thumb_name = f'{self.thumb_size[0]}x{self.thumb_size[1]}_{name}'
+        thumb_name = f'{self.thumb_size[0]}x{self.thumb_size[1]}_{self.uuid_name}{self.ext}'
 
         return os.path.join(self.thumb_dir, thumb_name)
 
@@ -175,26 +182,35 @@ def add_post_for(telephone, image_url, thumb_url):
     return post
 
 
-# 根据id取图片路径
+
 def get_post_by_id(post_id):
-    '''
+    """
+    根据id取图片路径
     :param post_id: post的id值
     :return: 该post所有数据
-    '''
+    """
     post = session.query(Post).filter_by(id=post_id).first()
     return post
 
 
-# 获取所有post
 def get_all_post():
-    '''
+    """
+    获取所有post
     :return: 所有的post
-    '''
+    """
     return session.query(Post).all()
 
 
-
-
+def get_post_for(user_phone):
+    """
+    :param user_phone: 某一用户的所有post
+    :return:
+    """
+    user = session.query(User).filter_by(telephone=user_phone).first()
+    if user:
+        return user.posts
+    else:
+        return []
 
 
 

@@ -6,7 +6,11 @@
     <h1>index</h1><br>
     <hr>
     {% for post in posts %}
-        <img src="{{ post.image_url }}" width="500px" height="500px"><br>
+        <a href="/post/{{ p.id }}">
+            <img src="{{ static_url(post.image_url) }}" width="500px" height="500px">
+        </a>
+
+        <br>
     {% end %}
 
 {% end %}

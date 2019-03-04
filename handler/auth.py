@@ -41,6 +41,7 @@ class LoginHandler(AuthBaseHandler):
         self.render(
             template_name="login.html",
             nextname=next_name,
+            user=None,
         )
 
     def post(self, *args, **kwargs):
@@ -88,6 +89,7 @@ class RegistHandler(AuthBaseHandler):
         self.render(
             template_name='regist.html',
             msg=msg,
+            user=None,
         )
 
 

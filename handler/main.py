@@ -1,7 +1,9 @@
 import time
 
 from tornado.web import RequestHandler, authenticated
-from util.photo import get_all_post, get_imgs, save_thumbnail, get_thumbnail, save_upload_pic, add_post_for, get_post_by_id
+
+from util.photo import get_all_post, add_post_for, get_post_by_id, get_post_for
+from util.photo import UploadImage
 from .auth import AuthBaseHandler
 
 
@@ -10,12 +12,12 @@ class IndexHandler(AuthBaseHandler):
 
     def get(self):
 
-        posts = get_all_post()
+        my_post = get_post_for(self.current_user)
 
         self.render(
             template_name='index.html',
-            posts=posts,
-            user=self.current_user
+            posts=my_post,
+            user=self.current_user,
         )
 
 
@@ -51,24 +53,27 @@ class PostHandler(AuthBaseHandler):
 class UploadHandler(AuthBaseHandler):
 
     @authenticated
-    def get(self):
+    def get(self, *args, **kwargs):
         self.render(
             template_name='upload.html',
             user=self.current_user,
         )
 
-    def post(self):
-        img_list = self.request.files.get('picture', [])
+    def post(self, *args, **kwargs):
+
+        img_list = self.request.files.get('picture', ['static_path'])
 
         post_id = 0
 
         for upload_img in img_list:
 
-            upload_img_path = save_upload_pic(upload_img)
+            my_upload_image = UploadImage(old_name=upload_img['filename'], static_path=self.settings['static_path'])
 
-            thumb_path = save_thumbnail(image_path=upload_img_path)
+            my_upload_image.save_upload_pic(upload_img['body'])
 
-            post = add_post_for(self.current_user, upload_img_path, thumb_path)
+            my_upload_image.save_thumbnail()
+
+            post = add_post_for(self.current_user, my_upload_image.upload_img_url, my_upload_image.thumb_url)
 
             post_id = post.id
 
@@ -78,7 +83,28 @@ class UploadHandler(AuthBaseHandler):
 
         self.redirect(f'/post/{post_id}')
 
-
+        '''
+        def post(self, *args, **kwargs):
+            img_list = self.request.files.get('picture', [])
+    
+            post_id = 0
+    
+            for upload_img in img_list:
+    
+                upload_img_path = save_upload_pic(upload_img)
+    
+                thumb_path = save_thumbnail(image_path=upload_img_path)
+    
+                post = add_post_for(self.current_user, upload_img_path, thumb_path)
+    
+                post_id = post.id
+    
+            self.write('略缩图保存成功, 5秒后将跳转到详情页')
+    
+            time.sleep(5)
+    
+            self.redirect(f'/post/{post_id}')
+        '''
 
 # 接收找不到的路由
 class NoneHandle_01(RequestHandler):
