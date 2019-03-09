@@ -4,7 +4,9 @@ import os
 import uuid
 
 from PIL import Image
-from data.account import session, Post, User
+from sqlalchemy_pagination import paginate
+
+from data.account import session, Post, User, Like
 
 # 上传图片的保存路径
 upload_pic_path = os.path.join('static', 'upload', '*.jpg')
@@ -63,7 +65,7 @@ class UploadImage(object):
     def gen_uuid_name(self):
         """
         生成唯一的文件ID，用来作为图片的名字
-        :return:
+        :return:唯一的文件id
         """
         return uuid.uuid4().hex
 
@@ -182,7 +184,6 @@ def add_post_for(telephone, image_url, thumb_url):
     return post
 
 
-
 def get_post_by_id(post_id):
     """
     根据id取图片路径
@@ -193,26 +194,68 @@ def get_post_by_id(post_id):
     return post
 
 
-def get_all_post():
+def get_all_post(page):
     """
     获取所有post
     :return: 所有的post
     """
-    return session.query(Post).all()
+    posts = session.query(Post).order_by(Post.id.desc())
+    pg = paginate(query=posts, page=page, page_size=10)
+    return pg.items
 
 
-def get_post_for(user_phone):
+def get_posts_for(user_phone):
     """
     :param user_phone: 某一用户的所有post
-    :return:
+    :return: 该用户拥有（上传）的所有post数据
     """
     user = session.query(User).filter_by(telephone=user_phone).first()
     if user:
-        return user.posts
+        return session.query(Post).filter_by(user_id=user.id).order_by(Post.id.desc()).all()
     else:
         return []
 
 
+def get_like_posts(telephone):
+    """
+    获取该用户喜爱的图片
+    :param telephone:
+    :return: 该用户收藏的所有post的id
+    """
+    user = session.query(User).filter(User.telephone==telephone).first()
+    if user:
+        return session.query(Post).filter(Post.id == Like.post_id, Post.user_id == Like.user_id).order_by(Post.id).all()
+    else:
+        return []
+
+
+def make_page(page, per_page=5):
+    """
+    分页的函数
+    :param page:
+    :param per_page:
+    :return:
+    """
+    posts = session.query(Post).order_by(Post.id.desc())
+    pg = paginate(query=posts, page=page, page_size=per_page)
+    return pg
+
+
+def get_like_count(post_id):
+    """
+    统计喜欢的人数
+    :param post_id:
+    :return:
+    """
+    return session.query(User).filter(User.id == Like.user_id, Like.post_id == post_id).count()
+
+def mark_like(post_id, telephone):
+    """
+    :param post_id:
+    :param username:
+    :return:
+    """
+    user = session.query(User).filter_by()
 
 
 

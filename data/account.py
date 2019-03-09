@@ -50,11 +50,10 @@ class User(Base):
 
         session.commit()
 
-
-    # 通过telephone获取username
     @classmethod
     def get_username_by_telephone(cls, telephone):
         '''
+        通过telephone获取username
         :param telephone:
         :return: username
         '''
@@ -62,10 +61,11 @@ class User(Base):
         return user.username
 
 
-    # 核对telephone和password
+
     @classmethod
     def check_password(cls, telephone, hashed_password):
         '''
+        核对telephone和password
         :param telephone:
         :param hashed_password:
         :return: bool
@@ -76,10 +76,11 @@ class User(Base):
         return False
 
 
-    # 检查该号码是否已经注册过
+
     @classmethod
     def is_exists(cls, telephone):
         '''
+        检查该号码是否已经注册过
         :param telephone:
         :return: bool
         '''
@@ -105,6 +106,13 @@ class Post(Base):
          thumb_url={self.thumb_url}, user_id={self.user_id}, user={self.user})>'
 
 
+class Like(Base):
+    """
+    用户喜欢图片的信息
+    """
+    __tablename__ = "likes"
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id'), nullable=False, primary_key=True)
 
 
 

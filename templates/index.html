@@ -3,14 +3,38 @@
 {% block title %} index {% end %}
 
 {% block content %}
-    <h1>index</h1><br>
-    <hr>
-    {% for post in posts %}
-        <a href="/post/{{ p.id }}">
-            <img src="{{ static_url(post.image_url) }}" width="500px" height="500px">
-        </a>
 
-        <br>
-    {% end %}
+<div class="row">
+    <div class="col-sm-8">
+        <div class="alert alert-warning" role="alert">
+            <b>I am Index</b><br>
+        </div>
+
+        <hr>
+
+        {% for post in posts %}
+            <a href="/post/{{ post.id }}">
+                <img class="img-fluid" src="{{ static_url(post.image_url)}}" width="250" height="250">
+                <br>
+            </a>
+
+            <br>
+        {% end %}
+    </div>
+
+    <div class="col-sm-4">
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="{{ static_url("images/04.jpg") }}" alt="Card image cap">
+            <div class="card-body">
+                <h4 class="card-title text-primary" >
+                    <i class="fa-id-card"></i>Card title
+                </h4>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 {% end %}
