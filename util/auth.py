@@ -61,12 +61,38 @@ def regist(username, telephone, raw_password):
         return {'msg': 'This number has been registered.'}
 
 
-# bool值  检查是否存在该用户
 def is_exsist_user(telephone):
-    if User.get_username_by_telephone(telephone=telephone):
+    """
+    bool值  检查是否存在该用户
+    :param telephone:
+    :return: bool
+    """
+    if User.get_user_by_telephone(telephone=telephone):
         return True
     else:
         return False
+
+
+def get_user_by_telephone(telephone):
+    """
+    通过telephone获取该用户所有信息
+    :param telephone:
+    :return:User
+    """
+    return User.get_user_by_telephone(telephone=telephone)
+
+
+def get_username_by_telephone(telephone):
+    """
+    通过telephone获取该用户名
+    :param telephone:
+    :return:用户名
+    """
+    user = User.get_user_by_telephone(telephone=telephone)
+    if user:
+        return user.username
+    else:
+        return None
 
 
 

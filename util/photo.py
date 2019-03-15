@@ -224,12 +224,14 @@ def get_like_posts(telephone):
     """
     user = session.query(User).filter(User.telephone==telephone).first()
     if user:
-        return session.query(Post).filter(Post.id == Like.post_id, Post.user_id == Like.user_id).order_by(Post.id).all()
+        return session.query(Post).\
+            filter(Post.id == Like.post_id, Like.user_id == User.id)\
+            .order_by(Post.id.desc()).all()
     else:
         return []
 
 
-def make_page(page, per_page=5):
+def make_page(page, per_page=10):
     """
     分页的函数
     :param page:
@@ -243,19 +245,32 @@ def make_page(page, per_page=5):
 
 def get_like_count(post_id):
     """
-    统计喜欢的人数
+    统计该post(的图片)喜欢的人数
     :param post_id:
     :return:
     """
     return session.query(User).filter(User.id == Like.user_id, Like.post_id == post_id).count()
 
+
 def mark_like(post_id, telephone):
     """
+    当前用户 收藏 该图片的动作
     :param post_id:
     :param username:
     :return:
     """
     user = session.query(User).filter_by()
+
+
+def is_like(current_user_telephone, post):
+    """
+    判断当前用户是否喜欢了该图片
+    :return:
+    """
+    pass
+
+
+
 
 
 

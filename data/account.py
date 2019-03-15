@@ -51,14 +51,14 @@ class User(Base):
         session.commit()
 
     @classmethod
-    def get_username_by_telephone(cls, telephone):
+    def get_user_by_telephone(cls, telephone):
         '''
         通过telephone获取username
         :param telephone:
         :return: username
         '''
         user = session.query(cls).filter(cls.telephone == telephone).first()
-        return user.username
+        return user
 
 
 
@@ -114,6 +114,8 @@ class Like(Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False, primary_key=True)
     post_id = Column(Integer, ForeignKey('posts.id'), nullable=False, primary_key=True)
 
+    def __repr__(self):
+        return f"""<Like(user_id={self.user_id}, post_id={self.post_id})>"""
 
 
 

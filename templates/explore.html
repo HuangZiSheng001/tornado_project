@@ -9,12 +9,51 @@
             <b>I am Explore</b><br>
         </div>
         <hr>
-        {% for post in posts %}
+        {% for post in pg.items %}
             <a href="/post/{{ post.id }}">
-                <img class="img-fluid" src="{{ static_url(post.image_url) }}" width="300px" height="300px">
+                <img class="img-fluid" src="{{ static_url(post.thumb_url) }}">
             </a>
             &emsp;&emsp;&emsp;
         {% end %}
     </div>
+    </div>
 
+    <!--导航栏-->
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+          {% if pg.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="/explore?page={{ pg.previous_page }}" tabindex="-1">
+                  Previous
+                </a>
+            </li>
+          {% else %}
+            <li class="page-item">
+                <a class="page-link disabled" tabindex="-1">
+                  Previous
+                </a>
+            </li>
+          {% end %}
+
+          {% for n in range(1, pg.pages + 1) %}
+            <li class="page-item {% if n == page_number %} active {% end %}">
+                <a class="page-link " href="/explore?page={{ n }}">
+                    {{ n }}
+                </a>
+            </li>
+          {% end %}
+
+          {% if pg.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="/explore?page={{ pg.next_page }}">Next</a>
+            </li>
+          {% else %}
+            <li class="page-item">
+                <a class="page-link disabled" tabindex="-1">
+                  Next
+                </a>
+            </li>
+          {% end %}
+      </ul>
+    </nav>
 {% end %}

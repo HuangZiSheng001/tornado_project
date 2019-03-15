@@ -1,14 +1,18 @@
 import time
 
 from tornado.web import RequestHandler, authenticated
+from tornado.websocket import WebSocketHandler
+
 from util.photo import get_all_post, add_post_for, get_post_by_id, get_posts_for
-from util.photo import UploadImage, get_like_count, get_like_posts
+from util.photo import UploadImage, get_like_count, get_like_posts, make_page, mark_like
+from util.auth import get_username_by_telephone
 from .auth import AuthBaseHandler
 
 
-# 主页面，所关注的用户的图片展示
 class IndexHandler(AuthBaseHandler):
-
+    """
+    主页面
+    """
     def get(self):
 
         my_post = get_posts_for(self.current_user)
@@ -16,7 +20,7 @@ class IndexHandler(AuthBaseHandler):
         self.render(
             template_name='index.html',
             posts=my_post,
-            user=self.current_user,
+            user=get_username_by_telephone(telephone=self.current_user),
         )
 
 
@@ -26,12 +30,18 @@ class ExploreHandler(AuthBaseHandler):
     """
     @authenticated
     def get(self):
-        page = int(self.get_argument('page', '1'))
-        posts = get_all_post(page=page)
+        page_number = int(self.get_argument('page', '1'))
+        per_page = int(self.get_argument('number', '10'))
+        pg = make_page(page=page_number, per_page=per_page)
+
+        # posts = get_all_post(page=page)
+
         self.render(
             template_name='explore.html',
-            posts=posts,
-            user=self.current_user,
+            # posts=posts,
+            user=get_username_by_telephone(self.current_user),
+            pg=pg,
+            page_number=page_number,
         )
 
 
@@ -41,11 +51,11 @@ class PostHandler(AuthBaseHandler):
     """
     @authenticated
     def get(self, *args, **kwargs):
-        like_count = 3
+        like_count = get_like_count(kwargs['post_id'])
         self.render(
             template_name='post.html',
             post=get_post_by_id(kwargs['post_id']),
-            user=self.current_user,
+            user=get_username_by_telephone(self.current_user),
             like_count=like_count,
         )
 
@@ -58,7 +68,7 @@ class UploadHandler(AuthBaseHandler):
     def get(self, *args, **kwargs):
         self.render(
             template_name='upload.html',
-            user=self.current_user,
+            user=get_username_by_telephone(self.current_user),
         )
 
     def post(self, *args, **kwargs):
@@ -86,29 +96,36 @@ class ProfileHandler(AuthBaseHandler):
     """
     用户信息中心
     """
+    @authenticated
     def get(self, *args, **kwargs):
-        user_id = self.get_argument('user_id', '')
-        if not user_id:
-            telephone = self.current_user
-        else:
-            # 通过user_id 拿到telephone
-            telephone = 0
 
-        posts = get_posts_for(user_phone=self.current_user)
-        like_posts = get_like_posts(telephone=telephone)
+        user_phone = self.get_argument('telephone', '')
+        if not user_phone:
+            user_phone = self.current_user
+
+        posts = get_posts_for(user_phone=user_phone)
+        like_posts = get_like_posts(telephone=user_phone)
 
         self.render(
             template_name='profile.html',
             posts=posts,
             like_posts=like_posts,
+            user=get_username_by_telephone(self.current_user),
         )
 
 
+class ChatHandle(AuthBaseHandler):
+    def get(self, *args, **kwargs):
+        self.render('room,html')
 
 
 
-# 接收找不到的路由
+
+
 class NoneHandle_01(RequestHandler):
+    """
+    接收找不到的路由
+    """
     def get(self, *args):
         self.send_error(404)
         # self.set_status(404, 'error!!!')

@@ -3,12 +3,11 @@
 {% block title %} post page {% end %}
 
 {% block content %}
-    <h1>I am post {{ post.id }} page</h1>
     <br>
     <img src="{{ static_url(post.image_url) }}"><br>
 
     <p>
+        <i class="fa fa-heart-o text-danger"></i> <b>{{ like_count }}</b> <br>
         upload by <b>{{ post.user.username }} </b>
-        <i class="fa fa-heart-o text-danger"></i> <b>{{ like_count }}</b>
     </p>
 {% end %}

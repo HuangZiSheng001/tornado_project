@@ -74,16 +74,19 @@ class LoginHandler(AuthBaseHandler):
             self.write('fail to login, check the account')
 
 
-
-# 实现登出功能, 即注销账号
 class LoginOutHandler(AuthBaseHandler):
+    """
+    实现登出功能, 即注销账号
+    """
     def get(self, *args, **kwargs):
         self.session.delete('user_ID')
         self.redirect('/login')
 
 
-# 注册功能
 class RegistHandler(AuthBaseHandler):
+    """
+    注册功能
+    """
     def get(self, *args, **kwargs):
         msg = self.get_argument('msg', None)
         self.render(

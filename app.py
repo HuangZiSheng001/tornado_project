@@ -10,7 +10,8 @@ from tornado.options import define, options
 
 from handler.auth import LoginHandler, LoginOutHandler, RegistHandler
 from handler.main import IndexHandler, ExploreHandler, PostHandler, UploadHandler, NoneHandle_01
-
+from handler.main import ProfileHandler
+from handler.chat import MessageHandler, ChatRoomHandler
 
 import util.ui_methods
 import util.ui_modules
@@ -29,6 +30,10 @@ class Application(tornado.web.Application):
             (r'/login', LoginHandler),
             (r'/regist', RegistHandler),
             (r'/logout', LoginOutHandler),
+            (r'/profile', ProfileHandler),
+
+            (r'/ws', MessageHandler),
+            (r'/chat', ChatRoomHandler),
 
             # 接受找不到的路由
             (r'/(.*)', NoneHandle_01),
