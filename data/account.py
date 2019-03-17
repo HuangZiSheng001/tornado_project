@@ -102,8 +102,15 @@ class Post(Base):
     user = relationship('User', back_populates='posts')
 
     def __repr__(self):
-        return f'<Post(id={self.id}, image_url={self.image_url},\
-         thumb_url={self.thumb_url}, user_id={self.user_id}, user={self.user})>'
+        return '<Post(id={}, image_url={},\
+         thumb_url={}, user_id={}, user={})>'.format(
+            self.id,
+            self.image_url,
+            self.thumb_url,
+            self.user_id,
+            self.user,
+
+        )
 
 
 class Like(Base):
@@ -115,7 +122,10 @@ class Like(Base):
     post_id = Column(Integer, ForeignKey('posts.id'), nullable=False, primary_key=True)
 
     def __repr__(self):
-        return f"""<Like(user_id={self.user_id}, post_id={self.post_id})>"""
+        return """<Like(user_id={}, post_id={})>""".format(
+            self.user_id,
+            self.post_id,
+        )
 
 
 

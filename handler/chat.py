@@ -31,7 +31,7 @@ class MessageHandler(AuthBaseWebSocketHandler):
         print("WebSocket opened {}".format(self))
         MessageHandler.users.add(self)
         for w in MessageHandler.users:
-            w.write_message(f"{get_username_by_telephone(self.current_user)}--进入了聊天室")
+            w.write_message("{}--进入了聊天室".format(get_username_by_telephone(self.current_user)))
 
     def on_message(self, message):
         """
@@ -39,8 +39,9 @@ class MessageHandler(AuthBaseWebSocketHandler):
         :param message:
         :return:
         """
-        print(f"get : {message}")
+        print("get : {}".format(message))
         parsed = tornado.web.escape.json_decode(message)
+
         chat = {
             'id': str(uuid.uuid4()),
             'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -56,15 +57,32 @@ class MessageHandler(AuthBaseWebSocketHandler):
             ),
             'id': chat['id'],
         }
+
+        MessageHandler.update_history(msg)
+        MessageHandler.send_updates(msg)
+
+    @classmethod
+    def update_history(cls, msg):
+        """
+        更新历史消息列表
+        :param msg:
+        :return:
+        """
         MessageHandler.history.append(msg)
 
         # 截取历史记录
         if len(MessageHandler.history) > MessageHandler.history_size:
             MessageHandler.history = MessageHandler.history[-MessageHandler.history_size:]
 
+    @classmethod
+    def send_updates(cls, msg):
+        """
+        给每个等待接收的用户发新的消息
+        :param msg:
+        :return:
+        """
         for w in MessageHandler.users:
             w.write_message(msg)
-
 
     def on_close(self):
         MessageHandler.users.remove(self)

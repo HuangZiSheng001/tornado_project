@@ -100,7 +100,12 @@ class UploadImage(object):
         生成用来保存图片缩略图相对路径的url
         :return:thum_url
         """
-        thumb_name = f'{self.thumb_size[0]}x{self.thumb_size[1]}_{self.uuid_name}{self.ext}'
+        thumb_name = '{}x{}_{}{}'.format(
+            self.thumb_size[0],
+            self.thumb_size[1],
+            self.uuid_name,
+            self.ext,
+        )
 
         return os.path.join(self.thumb_dir, thumb_name)
 
@@ -133,7 +138,9 @@ def save_upload_pic(upload_img):
 
     # save_pic_path = os.path.join('static/upload', upload_img['filename'])
 
-    save_pic_path = f'static/upload/{upload_img["filename"]}'
+    save_pic_path = 'static/upload/{}'.format(
+        upload_img["filename"],
+    )
 
     with open(save_pic_path, 'wb') as fp:
         fp.write(upload_img['body'])
@@ -157,7 +164,11 @@ def save_thumbnail(image_path):
     # 获取最后的xxx.jpg
     name = os.path.basename(image_path)
 
-    thumb_path = f'static/thumb/{size[0]}x{size[1]}_{name}'
+    thumb_path = 'static/thumb/{}x{}_{}'.format(
+        size[0],
+        size[1],
+        name,
+    )
 
     im.save(thumb_path)
 

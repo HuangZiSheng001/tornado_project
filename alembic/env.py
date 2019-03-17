@@ -20,20 +20,14 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-
+# target_metadata = None
 import sys
 from os.path import abspath, dirname
-root = dirname(dirname(abspath(__file__)))
+sys.path.append(dirname(dirname(abspath(__file__))))
+from data.account import Base
+target_metadata = Base.metadata
 
-# 把根目录放入sys.path中
-sys.path.append(root)
 
-
-from data import account
-# 要从继承了Base的module中引用
-# 元数据， 指导对应表入库
-# 类似flask中 make migration
-target_metadata = account.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

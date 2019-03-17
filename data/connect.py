@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 USERNAME = 'root'
-PASSWORD = 'root'
+PASSWORD = 'qwe123'
 DATABASE_IP = '127.0.0.1'
 DATABASE_PORT = '3306'
 DATABASE_NAME = 'tornado_01'
@@ -30,7 +30,6 @@ Base = declarative_base(engine)
 Session = sessionmaker(engine)
 
 session = Session()
-
 
 
 if __name__ == '__main__':

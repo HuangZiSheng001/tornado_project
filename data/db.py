@@ -5,10 +5,10 @@ from sqlalchemy.orm import sessionmaker
 
 
 USERNAME = 'root'
-PASSWORD = 'root'
+PASSWORD = 'qwe123'
 DATABASE_IP = '127.0.0.1'
 DATABASE_PORT = '3306'
-DATABASE_NAME = 'tornado_project'
+DATABASE_NAME = 'tornado_01'
 
 Db_url = 'mysql+pymysql://{username}:{password}@{ip}:{port}/{db_name}?charset=utf8'.format(
     username=USERNAME,

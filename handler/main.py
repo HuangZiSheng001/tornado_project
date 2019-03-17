@@ -89,7 +89,7 @@ class UploadHandler(AuthBaseHandler):
 
             post_id = post.id
 
-        self.redirect(f'/post/{post_id}')
+        self.redirect('/post/{}'.format(post_id))
 
 
 class ProfileHandler(AuthBaseHandler):
