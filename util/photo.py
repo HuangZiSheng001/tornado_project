@@ -233,10 +233,10 @@ def get_like_posts(telephone):
     :param telephone:
     :return: 该用户收藏的所有post的id
     """
-    user = session.query(User).filter(User.telephone==telephone).first()
+    user = session.query(User).filter(User.telephone == telephone).first()
     if user:
         return session.query(Post).\
-            filter(Post.id == Like.post_id, Like.user_id == User.id)\
+            filter(Like.post_id == Post.id, Like.user_id == user.id)\
             .order_by(Post.id.desc()).all()
     else:
         return []
