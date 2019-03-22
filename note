@@ -26,6 +26,8 @@ django
 
 bootstrap
 
+jinja2过滤器
+{{ my_variable|default("my_variable is not defined") }}
 
 
 使用alembic管理数据库版本

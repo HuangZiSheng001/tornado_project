@@ -4,10 +4,6 @@ import tornado.options
 
 
 from tornado.options import define, options
-
-
-# tornado没有内置session
-
 from handler.auth import LoginHandler, LoginOutHandler, RegistHandler
 from handler.main import IndexHandler, ExploreHandler, PostHandler, UploadHandler, NoneHandle_01
 from handler.main import ProfileHandler

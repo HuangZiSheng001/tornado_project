@@ -1,10 +1,13 @@
 import tornado
 import uuid
 import datetime
-from util.auth import get_username_by_telephone
 
+from tornado.httpclient import AsyncHTTPClient
 from tornado.web import RequestHandler, authenticated
+from tornado.ioloop import IOLoop
+
 from .auth import AuthBaseWebSocketHandler
+from util.auth import get_username_by_telephone
 
 
 class MessageHandler(AuthBaseWebSocketHandler):
@@ -39,27 +42,74 @@ class MessageHandler(AuthBaseWebSocketHandler):
         :param message:
         :return:
         """
-        print("get : {}".format(message))
+        # print("get : {}".format(message))
         parsed = tornado.web.escape.json_decode(message)
+        body = parsed['body']
 
+        if body and (body.startswith("http://") or body.startswith("https://")):
+
+            client = AsyncHTTPClient()
+
+            # 拼接请求接口url
+            save_api_url = "http://{ip}:{port}/save?save_url={save_url}&telephone={phone}&from=room".format(
+                ip="127.0.0.1",
+                port="8080",
+                save_url=body,
+                phone=self.current_user,
+            )
+
+            IOLoop.current().spawn_callback(client.fetch, save_api_url)
+
+            chat = MessageHandler.make_chat(msg_body='picture link: {} is downloading...'.format(body))
+
+            msg = {
+                'html': tornado.web.escape.to_basestring(
+                    self.render_string(
+                        template_name='message.html',
+                        chat=chat,
+                    )
+                ),
+                'id': chat['id'],
+            }
+
+            MessageHandler.update_history(msg)
+            MessageHandler.send_updates(msg)
+
+        else:
+            chat = MessageHandler.make_chat(
+                name=get_username_by_telephone(self.current_user),
+                msg_body=parsed['body'],
+            )
+
+            msg = {
+                'html': tornado.web.escape.to_basestring(
+                    self.render_string(
+                        template_name='message.html',
+                        chat=chat,
+                    )
+                ),
+                'id': chat['id'],
+            }
+            MessageHandler.update_history(msg)
+            MessageHandler.send_updates(msg)
+
+    @classmethod
+    def make_chat(cls, msg_body, name='systerm', img_url=None):
+        """
+        生成chat
+        :param msg_body:
+        :param name:
+        :param img_url:
+        :return: chat 字典形式
+        """
         chat = {
             'id': str(uuid.uuid4()),
             'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'user': get_username_by_telephone(self.current_user),
-            'body': parsed['body'],
+            'user': name,
+            'body': msg_body,
+            'img_url': img_url,
         }
-        msg = {
-            'html': tornado.web.escape.to_basestring(
-                self.render_string(
-                    template_name='message.html',
-                    chat=chat,
-                )
-            ),
-            'id': chat['id'],
-        }
-
-        MessageHandler.update_history(msg)
-        MessageHandler.send_updates(msg)
+        return chat
 
     @classmethod
     def update_history(cls, msg):

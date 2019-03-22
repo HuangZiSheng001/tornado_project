@@ -1,8 +1,3 @@
-
-'''
-实现登录功能的handler
-'''
-
 from tornado.web import RequestHandler
 
 from tornado.websocket import WebSocketHandler
@@ -11,7 +6,12 @@ from tornado.websocket import WebSocketHandler
 from pycket.session import SessionMixin
 
 # 账户信息是否正确
-from util.auth import authenticate, regist, is_exsist_user
+from util.auth import authenticate, regist
+from data.db import DBSession
+
+'''
+实现登录功能的handler
+'''
 
 
 # 有身份验证功能的basehandler
@@ -20,8 +20,8 @@ class AuthBaseHandler(RequestHandler, SessionMixin):
         current_user = self.session.get('user_ID')
         if current_user:
             return current_user
-
         return None
+
 
 
 # 声明websocket基类, 采用websocket协议
