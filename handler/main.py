@@ -1,7 +1,6 @@
 import time
 
 from tornado.web import RequestHandler, authenticated
-from tornado.websocket import WebSocketHandler
 
 from util.photo import get_all_post, add_post_for, get_post_by_id, get_posts_for
 from util.photo import UploadImage, get_like_count, get_like_posts, make_page, mark_like
@@ -15,7 +14,7 @@ class IndexHandler(AuthBaseHandler):
     """
     def get(self):
 
-        my_post = get_posts_for(self.current_user)
+        my_post = self.orm.get_posts_for()
 
         self.render(
             template_name='index.html',
@@ -32,7 +31,7 @@ class ExploreHandler(AuthBaseHandler):
     def get(self):
         page_number = int(self.get_argument('page', '1'))
         per_page = int(self.get_argument('number', '10'))
-        pg = make_page(page=page_number, per_page=per_page)
+        pg = self.orm.make_page(page=page_number, per_page=per_page)
 
         # posts = get_all_post(page=page)
 
@@ -51,10 +50,10 @@ class PostHandler(AuthBaseHandler):
     """
     @authenticated
     def get(self, *args, **kwargs):
-        like_count = get_like_count(kwargs['post_id'])
+        like_count = self.orm.get_like_count(kwargs['post_id'])
         self.render(
             template_name='post.html',
-            post=get_post_by_id(kwargs['post_id']),
+            post=self.orm.get_post_by_id(kwargs['post_id']),
             user=get_username_by_telephone(self.current_user),
             like_count=like_count,
         )
@@ -85,7 +84,7 @@ class UploadHandler(AuthBaseHandler):
 
             my_upload_image.save_thumbnail()
 
-            post = add_post_for(self.current_user, my_upload_image.upload_img_url, my_upload_image.thumb_url)
+            post = self.orm.add_post_for(my_upload_image.upload_img_url, my_upload_image.thumb_url)
 
             post_id = post.id
 
@@ -103,8 +102,8 @@ class ProfileHandler(AuthBaseHandler):
         if not user_phone:
             user_phone = self.current_user
 
-        posts = get_posts_for(user_phone=user_phone)
-        like_posts = get_like_posts(telephone=user_phone)
+        posts = self.orm.get_posts_for(user_phone=user_phone)
+        like_posts = self.orm.get_like_posts(telephone=user_phone)
 
         self.render(
             template_name='profile.html',

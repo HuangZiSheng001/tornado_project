@@ -5,27 +5,44 @@ from tornado.websocket import WebSocketHandler
 # tornado没有内置session
 from pycket.session import SessionMixin
 
+import logging
+
 # 账户信息是否正确
 from util.auth import authenticate, regist
 from data.db import DBSession
+from util.photo import OrmHandler
 
 '''
 实现登录功能的handler
 '''
 
+my_logger = logging.getLogger('tudo_base.log')
 
-# 有身份验证功能的basehandler
+
 class AuthBaseHandler(RequestHandler, SessionMixin):
+    """
+    有身份验证功能的basehandler
+    """
     def get_current_user(self):
         current_user = self.session.get('user_ID')
         if current_user:
             return current_user
         return None
 
+    def prepare(self):
+        my_logger.info('new request prepare')
+        self.db_session = DBSession()
+        self.orm = OrmHandler(db_session=self.db_session, user_phone=self.current_user)
+
+    def on_finish(self):
+        my_logger.info('request on finish')
+        self.db_session.close()
 
 
-# 声明websocket基类, 采用websocket协议
 class AuthBaseWebSocketHandler(WebSocketHandler, SessionMixin):
+    """
+    声明websocket基类, 采用websocket协议
+    """
     def get_current_user(self):
         current_user = self.session.get('user_ID')
         if current_user:
@@ -33,9 +50,19 @@ class AuthBaseWebSocketHandler(WebSocketHandler, SessionMixin):
 
         return None
 
+    def prepare(self):
+        my_logger.info('new request prepare')
+        self.db_session = DBSession()
+        self.orm = OrmHandler(self.db_session, self.current_user)
 
-# 实现登陆功能
+    def on_finish(self):
+        my_logger.info('request on finish')
+        self.db_session.close()
+
 class LoginHandler(AuthBaseHandler):
+    """
+    实现登陆功能
+    """
     def get(self, *args, **kwargs):
         next_name = self.get_argument('next', '/')
         self.render(

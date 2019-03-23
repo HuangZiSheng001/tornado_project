@@ -98,7 +98,7 @@ class UploadImage(object):
     def thumb_url(self):
         """
         生成用来保存图片缩略图相对路径的url
-        :return:thum_url
+        :return:thum_url   保存图片缩略图相对路径的url
         """
         thumb_name = '{}x{}_{}{}'.format(
             self.thumb_size[0],
@@ -125,54 +125,120 @@ class UploadImage(object):
         im.save(os.path.join(self.static_path, self.thumb_url))
 
 
-
-def save_upload_pic(upload_img):
+class OrmHandler(object):
     """
-    保存上传的大图片的函数
-    :param image: 上传的reqest.file对象
-    :return: 保存后的文件路径
+    SQL ORM 管理   每次打开session操作完就关闭，保障各个进程之间能正产访问session
     """
 
-    # {"filename":..., "content_type":..., "body":...}
-    # html content type对照表
+    def __init__(self, db_session, user_phone):
+        """
+        :param db_session:
+        :param user_phone: self.current_user  为用户的号码
+        """
+        self.db_session = db_session
+        self.user_telephone = user_phone
+        
+    def get_user(self):
+        user = self.db_session.query(User).filter(User.telephone == self.user_telephone).first()
+        return user
 
-    # save_pic_path = os.path.join('static/upload', upload_img['filename'])
+    def add_post_for(self, image_url, thumb_url):
+        """
+        把用户上传图片的信息存入DB， 会生成一个post的数据对象
+        :param telephone: 对应用户的telephone
+        :param image_url: 上传图片的路径
+        :param thumb_url: 略缩图路径
+        :return: 该post对象
+        """
 
-    save_pic_path = 'static/upload/{}'.format(
-        upload_img["filename"],
-    )
+        user = self.db_session.query(User).filter_by(telephone=self.user_telephone).first()
 
-    with open(save_pic_path, 'wb') as fp:
-        fp.write(upload_img['body'])
+        post = Post(image_url=image_url, thumb_url=thumb_url, user=user)
 
-    return save_pic_path
+        self.db_session.add(post)
 
+        self.db_session.commit()
 
-# 生成略缩图并保存，返回其路径
-def save_thumbnail(image_path):
-    """
-    :param image_path: 大图的图片路径
-    :return: 生成的略缩图的文件路径
-    """
+        return post
 
-    im = Image.open(image_path)
+    def get_post_by_id(self, post_id):
+        """
+        根据id取图片路径
+        :param post_id: post的id值
+        :return: 该post所有数据
+        """
+        post = self.db_session.query(Post).filter_by(id=post_id).first()
+        return post
 
-    size = (200, 200)
+    def get_all_post(self, page):
+        """
+        获取所有post
+        :return: 所有的post
+        """
+        posts = self.db_session.query(Post).order_by(Post.id.desc())
+        pg = paginate(query=posts, page=page, page_size=10)
+        return pg.items
 
-    im.thumbnail(size)
+    def get_posts_for(self):
+        """
+        :param user_phone: 某一用户的所有post
+        :return: 该用户拥有（上传）的所有post数据
+        """
+        user = self.db_session.query(User).filter_by(telephone=self.user_telephone).first()
+        if user:
+            return self.db_session.query(Post).filter_by(user_id=user.id).order_by(Post.id.desc()).all()
+        else:
+            return []
 
-    # 获取最后的xxx.jpg
-    name = os.path.basename(image_path)
+    def get_like_posts(self):
+        """
+        获取该用户喜爱的图片
+        :param telephone:
+        :return: 该用户收藏的所有post的id
+        """
+        user = self.db_session.query(User).filter(User.telephone == self.user_telephone).first()
+        if user:
+            return self.db_session.query(Post). \
+                filter(Like.post_id == Post.id, Like.user_id == user.id) \
+                .order_by(Post.id.desc()).all()
+        else:
+            return []
 
-    thumb_path = 'static/thumb/{}x{}_{}'.format(
-        size[0],
-        size[1],
-        name,
-    )
+    def make_page(self, page, per_page=10):
+        """
+        分页的函数
+        :param page:
+        :param per_page:
+        :return:
+        """
+        posts = self.db_session.query(Post).order_by(Post.id.desc())
+        pg = paginate(query=posts, page=page, page_size=per_page)
+        return pg
 
-    im.save(thumb_path)
+    def get_like_count(self, post_id):
+        """
+        统计该post(的图片)喜欢的人数
+        :param post_id:
+        :return:
+        """
+        return self.db_session.query(User).filter(User.id == Like.user_id, Like.post_id == post_id).count()
 
-    return thumb_path
+    def mark_like(self, post_id):
+        """
+        当前用户 收藏 该图片的动作
+        :param post_id:
+        :param username:
+        :return:
+        """
+        user = self.db_session.query(User).filter_by()
+        pass
+
+    def is_like(self, current_user_telephone, post):
+        """
+        判断当前用户是否喜欢了该图片
+        :return:
+        """
+        pass
 
 
 def add_post_for(telephone, image_url, thumb_url):
@@ -279,6 +345,59 @@ def is_like(current_user_telephone, post):
     :return:
     """
     pass
+
+
+
+
+
+
+def save_upload_pic(upload_img):
+    """
+    保存上传的大图片的函数
+    :param image: 上传的reqest.file对象
+    :return: 保存后的文件路径
+    """
+
+    # {"filename":..., "content_type":..., "body":...}
+    # html content type对照表
+
+    # save_pic_path = os.path.join('static/upload', upload_img['filename'])
+
+    save_pic_path = 'static/upload/{}'.format(
+        upload_img["filename"],
+    )
+
+    with open(save_pic_path, 'wb') as fp:
+        fp.write(upload_img['body'])
+
+    return save_pic_path
+
+
+# 生成略缩图并保存，返回其路径
+def save_thumbnail(image_path):
+    """
+    :param image_path: 大图的图片路径
+    :return: 生成的略缩图的文件路径
+    """
+
+    im = Image.open(image_path)
+
+    size = (200, 200)
+
+    im.thumbnail(size)
+
+    # 获取最后的xxx.jpg
+    name = os.path.basename(image_path)
+
+    thumb_path = 'static/thumb/{}x{}_{}'.format(
+        size[0],
+        size[1],
+        name,
+    )
+
+    im.save(thumb_path)
+
+    return thumb_path
 
 
 

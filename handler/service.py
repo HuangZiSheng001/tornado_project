@@ -25,8 +25,7 @@ class SyncSaveHandler(AuthBaseHandler):
         uim.save_upload_pic(resp.content)
         uim.save_thumbnail()
 
-        post = add_post_for(
-            telephone=telephone,
+        post = self.orm.add_post_for(
             image_url=uim.upload_img_url,
             thumb_url=uim.thumb_url,
         )
@@ -55,8 +54,7 @@ class AsyncSaveHandler(AuthBaseHandler):
         uim.save_upload_pic(resp.body)
         uim.save_thumbnail()
 
-        post = add_post_for(
-            telephone=telephone,
+        post = self.orm.add_post_for(
             image_url=uim.upload_img_url,
             thumb_url=uim.thumb_url,
         )

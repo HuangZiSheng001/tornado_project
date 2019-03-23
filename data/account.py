@@ -45,9 +45,7 @@ class User(Base):
         :return: None
         '''
         user = User(telephone=telephone, username=username, password=hashed_password)
-
         session.add(user)
-
         session.commit()
 
     @classmethod
@@ -112,7 +110,6 @@ class Post(Base):
 
         )
 
-
 class Like(Base):
     """
     用户喜欢图片的信息
@@ -126,7 +123,6 @@ class Like(Base):
             self.user_id,
             self.post_id,
         )
-
 
 
 if __name__ == '__main__':
